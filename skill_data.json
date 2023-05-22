@@ -1,0 +1,19 @@
+[
+    {"skill": "Python", "count": 392},
+    {"skill": "Spark", "count": 167},
+    {"skill": "AWS", "count": 176},
+    {"skill": "Excel", "count": 388},
+    {"skill": "SQL", "count": 380},
+    {"skill": "Sas", "count": 66},
+    {"skill": "Keras", "count": 29},
+    {"skill": "Pytorch", "count": 39},
+    {"skill": "Scikit", "count": 54},
+    {"skill": "TensorFlow", "count": 72},
+    {"skill": "Hadoop", "count": 124},
+    {"skill": "Tableau", "count": 148},
+    {"skill": "PowerBI", "count": 56},
+    {"skill": "Flink", "count": 10},
+    {"skill": "Mongo", "count": 37},
+    {"skill": "Google Analytics", "count": 14}
+  ]
+  
