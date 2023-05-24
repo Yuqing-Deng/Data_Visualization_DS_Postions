@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Squarified Treemap</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <style>
+        /* Add CSS styling here */
+        #chart {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 40px);
+        }
+
+        .tile {
+            font-size: 12px;
+            fill: black;
+            stroke: #fff;
+        }
+
+        .tile-label {
+            font-family: sans-serif;
+            font-size: 11px;
+            fill:black;
+            pointer-events: none;
+        }
+
+        .chart-title {
+            font-family: sans-serif;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h2 class="chart-title">Data Science Positions in Different Sectors & Industries</h2>
+    <div id="chart"></div>
+    <script>
+        // Load the data from the JSON file
+        d3.json('industry_data.json').then(data => {
+            const width = 1000;
+            const height = 700;
+
+            // Create the SVG container
+            const svg = d3.select('#chart')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+
+            // Define the treemap layout
+            const treemap = d3.treemap()
+                .size([width, height])
+                .padding(1)
+                .round(true);
+
+            // Convert the data to a hierarchical structure
+            const root = d3.hierarchy(data)
+                .sum(d => d.positions)
+                .sort((a, b) => b.value - a.value);
+
+            // Generate the treemap
+            treemap(root);
+
+            // Define the color scale
+            const colorScale = d3.scaleLinear()
+                .domain([0, d3.max(root.leaves(), d => d.data.positions)])
+                .range(['lightblue', 'darkblue']);
+
+            // Create the tiles
+            const tiles = svg.selectAll('.tile')
+                .data(root.leaves())
+                .enter()
+                .append('g')
+                .attr('class', 'tile')
+                .attr('transform', d => `translate(${d.x0}, ${d.y0})`);
+
+            tiles.append('rect')
+                .attr('width', d => d.x1 - d.x0)
+                .attr('height', d => d.y1 - d.y0)
+                .style('fill', d => colorScale(d.data.positions));
+
+            tiles.append('text')
+                .attr('class', 'tile-label')
+                .selectAll('tspan')
+                .style('font-size', d => Math.min((d.x1 - d.x0) / 4, 14) + 'px')
+                .data(d => d.data.name.split(/(?=[A-Z][^A-Z])/g))
+                .enter()
+                .append('tspan')
+                .attr('x', 4)
+                .attr('y', (d, i) => 12 + i * 10)
+                .text(d => d);
+
+            // Add tooltips
+            const tooltip = d3.select('body')
+                .append('div')
+                .attr('class', 'tooltip')
+                .style('opacity', 0);
+
+            tiles.on('mouseover', function (event, d) {
+                tooltip.transition()
+                    .duration(200)
+                    .style('opacity', .9);
+                tooltip.html(`Industry: ${d.data.name}<br>Positions: ${d.data.positions}`)
+                    .style('left', (event.pageX) + 'px')
+                    .style('top', (event.pageY - 28) + 'px');
+            });
+
+            tiles.on('mouseout', function () {
+                tooltip.transition()
+                    .duration(500)
+                    .style('opacity', 0);
+            });
+        });
+    </script>
+</body>
+</html>
